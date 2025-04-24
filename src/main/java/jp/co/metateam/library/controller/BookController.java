@@ -1,6 +1,9 @@
 package jp.co.metateam.library.controller;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
+import jp.co.metateam.library.model.Account;
+import jp.co.metateam.library.model.AccountDto;
 import jp.co.metateam.library.model.BookMst;
 import jp.co.metateam.library.model.BookMstDto;
 import jp.co.metateam.library.service.BookMstService;
@@ -23,7 +28,7 @@ import lombok.extern.log4j.Log4j2;
  */
 @Log4j2
 @Controller
-public class BookController {
+public class BookController{
     
     private final BookMstService bookMstService;
 
@@ -50,5 +55,74 @@ public class BookController {
 
         return "book/add";
     }
+
+    @PostMapping("book/add")
+    public String register(@Valid @ModelAttribute BookMstDto bookmstDto, BindingResult result, RedirectAttributes ra, Model model){
     
+        
+        String title = bookmstDto.getTitle();
+        String isbn = bookmstDto.getIsbn();
+
+        boolean errTitleNullFlg = false;
+        boolean errIsbnNullFlg = false;
+        boolean errTitlecaracountFlg = false;
+        boolean errIsbncaracountFlg = false;
+        boolean errIsbncaratypeFlg = false;
+
+        List<String> errTitleList = new ArrayList<>();
+        List<String> errIsbnList = new ArrayList<>();
+
+        if (title == "" || title == null){
+           errTitleList.add( "書籍名は必須です");
+           errTitleNullFlg = true;
+        }
+        if (isbn == "" || isbn == null ){
+           errIsbnList.add("ISBNは必須です");
+           errIsbnNullFlg = true;
+        }
+        if (title.length() >= 256){
+            errTitleList.add("書籍名は256文字以内で入力して下さい");
+            errTitlecaracountFlg = true;
+        }
+        if (isbn.length() != 13){
+            errIsbnList.add("ISBNは13字で入力して下さい");
+            errIsbncaracountFlg = true;
+        }
+
+        //isbnが数値かどうかチェック
+        String regex_num = "^[0-9]+$" ;
+        Pattern p1 = Pattern.compile(regex_num);
+        Matcher m1 = p1.matcher(isbn);
+        boolean IsbncaratypeFlg = m1.matches();
+
+        if(!IsbncaratypeFlg){
+            errIsbnList.add("ISBNは半角数字で入力してください");
+            errIsbncaratypeFlg = true;
+        }
+        if(errTitleNullFlg || errIsbnNullFlg || errTitlecaracountFlg || errIsbncaracountFlg || errIsbncaratypeFlg){
+            model.addAttribute("errtitle",errTitleList);
+            model.addAttribute("errisbn",errIsbnList);
+
+            return "book/add";
+        }
+
+        if(!bookMstService.isbnDuplicateCheck(isbn)){
+            model.addAttribute("errisbn", "登録済みのISBNです");
+            return "book/add";
+        }
+
+         bookMstService.save(bookmstDto);
+
+        return "redirect:/book/index";
+    
+
+       // model.addFlashAttribute("accountDto", accountDto);
+       // model.addFlashAttribute("org.springframework.validation.BindingResult.accountDto", result);
+
+        //bookMstService.save(bookmstDto);
+        //    return "redirect:/book/index";
+        
+    
+    
+}
 }
