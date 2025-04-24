@@ -43,7 +43,7 @@ public class RegisterController {
 
     
 
-    @PostMapping("/register")
+    @PostMapping("add_form")
     public String register(@Valid @ModelAttribute AccountDto accountDto, BindingResult result, RedirectAttributes ra) {
         try {
 
