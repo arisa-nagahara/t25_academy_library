@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import io.micrometer.common.util.StringUtils;
 import jakarta.validation.Valid;
 import jp.co.metateam.library.model.Account;
 import jp.co.metateam.library.model.AccountDto;
@@ -68,13 +69,15 @@ public class BookController{
         boolean errTitlecaracountFlg = false;
         boolean errIsbncaracountFlg = false;
         boolean errIsbncaratypeFlg = false;
+        
+    
+        List<String> errTitleList = new ArrayList<String>();
+        List<String> errIsbnList = new ArrayList<String>();
 
-        List<String> errTitleList = new ArrayList<>();
-        List<String> errIsbnList = new ArrayList<>();
-
-        if (title == "" || title == null){
-           errTitleList.add( "書籍名は必須です");
-           errTitleNullFlg = true;
+        if (StringUtils.isEmpty(title)){
+        
+           errTitleList.add( "書籍名は必須です");//エラーメッセージ
+           errTitleNullFlg = true;//NGだった場合
         }
         if (isbn == "" || isbn == null ){
            errIsbnList.add("ISBNは必須です");
@@ -106,7 +109,7 @@ public class BookController{
             return "book/add";
         }
 
-        if(!bookMstService.isbnDuplicateCheck(isbn)){
+        if(bookMstService.isbnDuplicateCheck(isbn)){
             model.addAttribute("errisbn", "登録済みのISBNです");
             return "book/add";
         }
@@ -122,7 +125,7 @@ public class BookController{
         //bookMstService.save(bookmstDto);
         //    return "redirect:/book/index";
         
-    
+
     
 }
 }
