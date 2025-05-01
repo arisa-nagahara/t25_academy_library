@@ -12,11 +12,11 @@
             <div th:replace="~{common :: header}"></div>
             <div class="inner_contens">
                 <div class="page_title">書籍一覧</div>
-                <form th:object="${BookMstDto}" th:action="@{/book/add}" method="get">
+                
                     <div class="submit_btn">
                         <input type="submit" value="書籍登録">
                     </div>
-                </form>                       
+                                   
                 <table class="books_table">
                     <tr>
                         <th>書籍名</th>
