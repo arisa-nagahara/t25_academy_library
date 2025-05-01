@@ -79,28 +79,29 @@ public class BookController{
            errTitleList.add( "書籍名は必須です");//エラーメッセージ
            errTitleNullFlg = true;//NGだった場合
         }
-        if (isbn == "" || isbn == null ){
-           errIsbnList.add("ISBNは必須です");
-           errIsbnNullFlg = true;
-        }
         if (title.length() >= 256){
             errTitleList.add("書籍名は256文字以内で入力して下さい");
             errTitlecaracountFlg = true;
         }
-        if (isbn.length() != 13){
-            errIsbnList.add("ISBNは13字で入力して下さい");
-            errIsbncaracountFlg = true;
-        }
+        if (isbn == "" || isbn == null ){
+           errIsbnList.add("ISBNは必須です");
+           errIsbnNullFlg = true;
+        }else{
+            if (isbn.length() != 13){
+                errIsbnList.add("ISBNは13字で入力して下さい");
+                errIsbncaracountFlg = true;
+            }
 
-        //isbnが数値かどうかチェック
-        String regex_num = "^[0-9]+$" ;
-        Pattern p1 = Pattern.compile(regex_num);
-        Matcher m1 = p1.matcher(isbn);
-        boolean IsbncaratypeFlg = m1.matches();
+            //isbnが数値かどうかチェック
+            String regex_num = "^[0-9]+$" ;
+            Pattern p1 = Pattern.compile(regex_num);
+            Matcher m1 = p1.matcher(isbn);
+            boolean IsbncaratypeFlg = m1.matches();
 
-        if(!IsbncaratypeFlg){
-            errIsbnList.add("ISBNは半角数字で入力してください");
-            errIsbncaratypeFlg = true;
+            if(!IsbncaratypeFlg){
+                errIsbnList.add("ISBNは半角数字で入力してください");
+                errIsbncaratypeFlg = true;
+            }
         }
         if(errTitleNullFlg || errIsbnNullFlg || errTitlecaracountFlg || errIsbncaracountFlg || errIsbncaratypeFlg){
             model.addAttribute("errtitle",errTitleList);
