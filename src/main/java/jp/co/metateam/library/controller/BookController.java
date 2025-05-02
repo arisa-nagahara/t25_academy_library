@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import io.micrometer.common.util.StringUtils;
 import jakarta.validation.Valid;
 import jp.co.metateam.library.model.Account;
 import jp.co.metateam.library.model.AccountDto;
@@ -68,36 +69,39 @@ public class BookController{
         boolean errTitlecaracountFlg = false;
         boolean errIsbncaracountFlg = false;
         boolean errIsbncaratypeFlg = false;
+        
+    
+        List<String> errTitleList = new ArrayList<String>();
+        List<String> errIsbnList = new ArrayList<String>();
 
-        List<String> errTitleList = new ArrayList<>();
-        List<String> errIsbnList = new ArrayList<>();
-
-        if (title == "" || title == null){
-           errTitleList.add( "書籍名は必須です");
-           errTitleNullFlg = true;
-        }
-        if (isbn == "" || isbn == null ){
-           errIsbnList.add("ISBNは必須です");
-           errIsbnNullFlg = true;
+        if (StringUtils.isEmpty(title)){
+        
+           errTitleList.add( "書籍名は必須です");//エラーメッセージ
+           errTitleNullFlg = true;//NGだった場合
         }
         if (title.length() >= 256){
             errTitleList.add("書籍名は256文字以内で入力して下さい");
             errTitlecaracountFlg = true;
         }
-        if (isbn.length() != 13){
-            errIsbnList.add("ISBNは13字で入力して下さい");
-            errIsbncaracountFlg = true;
-        }
+        if (isbn == "" || isbn == null ){
+           errIsbnList.add("ISBNは必須です");
+           errIsbnNullFlg = true;
+        }else{
+            if (isbn.length() != 13){
+                errIsbnList.add("ISBNは13字で入力して下さい");
+                errIsbncaracountFlg = true;
+            }
 
-        //isbnが数値かどうかチェック
-        String regex_num = "^[0-9]+$" ;
-        Pattern p1 = Pattern.compile(regex_num);
-        Matcher m1 = p1.matcher(isbn);
-        boolean IsbncaratypeFlg = m1.matches();
+            //isbnが数値かどうかチェック
+            String regex_num = "^[0-9]+$" ;
+            Pattern p1 = Pattern.compile(regex_num);
+            Matcher m1 = p1.matcher(isbn);
+            boolean IsbncaratypeFlg = m1.matches();
 
-        if(!IsbncaratypeFlg){
-            errIsbnList.add("ISBNは半角数字で入力してください");
-            errIsbncaratypeFlg = true;
+            if(!IsbncaratypeFlg){
+                errIsbnList.add("ISBNは半角数字で入力してください");
+                errIsbncaratypeFlg = true;
+            }
         }
         if(errTitleNullFlg || errIsbnNullFlg || errTitlecaracountFlg || errIsbncaracountFlg || errIsbncaratypeFlg){
             model.addAttribute("errtitle",errTitleList);
@@ -106,7 +110,7 @@ public class BookController{
             return "book/add";
         }
 
-        if(!bookMstService.isbnDuplicateCheck(isbn)){
+        if(bookMstService.isbnDuplicateCheck(isbn)){
             model.addAttribute("errisbn", "登録済みのISBNです");
             return "book/add";
         }
@@ -122,7 +126,7 @@ public class BookController{
         //bookMstService.save(bookmstDto);
         //    return "redirect:/book/index";
         
-    
+
     
 }
 }

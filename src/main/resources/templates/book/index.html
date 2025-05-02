@@ -11,7 +11,22 @@
         <div class="main_contents">
             <div th:replace="~{common :: header}"></div>
             <div class="inner_contens">
-                <div class="page_title">書籍一覧</div>
+                <div class="page_title">書籍一覧</div>               
+                    <div style = "text-align: right; margin: 20px;">
+                        <a th:href="@{/book/add}" class="book_register_button">
+                            <img class="user_icon" th:src="@{/images/icons/add.png}" alt="追加アイコン">書籍登録 
+                        </a>                  
+                    </div>
+                <table class="books_table">
+                    <tr>
+                        <th>書籍名</th>
+                        <th>ISBN</th>
+                    </tr>
+                    <tr th:each="book:${bookMstList}">
+                        <td th:text="${book.title}"></td>
+                        <td th:text="${book.isbn}"></td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
